@@ -14,24 +14,19 @@ CONN_STATE cstate = STATE_INIT;
 
 String bufferSerial;
 
-
 // BLE
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-
 BLEServer *pServer = NULL;
 BLECharacteristic * pTxCharacteristic;
 bool deviceConnected = false;
 bool deviceConnected_old = false;
 //uint8_t txValue = 0;
-
-#define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
-#define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
-#define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
-
+#define SERVICE_UUID           "e62efa94-afa8-11ed-afa1-0242ac120002"
+#define CHARACTERISTIC_UUID_TX "e62efe40-afa8-11ed-afa1-0242ac120002"
 
 // Scheduler (Ticker)
 #include <Ticker.h>
@@ -78,21 +73,21 @@ class FLC2BLE_SCB: public BLEServerCallbacks {
     }
 };
 
-class FLC2BLE_CharCB: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      std::string rxValue = pCharacteristic->getValue();
-
-      if (rxValue.length() > 0) {
-        Serial.println("*********");
-        Serial.print("Received Value: ");
-        for (int i = 0; i < rxValue.length(); i++)
-          Serial.print(rxValue[i]);
-
-        Serial.println();
-        Serial.println("*********");
-      }
-    }
-};
+//class FLC2BLE_CharCB: public BLECharacteristicCallbacks {
+//    void onWrite(BLECharacteristic *pCharacteristic) {
+//      std::string rxValue = pCharacteristic->getValue();
+//
+//      if (rxValue.length() > 0) {
+//        Serial.println("*********");
+//        Serial.print("Received Value: ");
+//        for (int i = 0; i < rxValue.length(); i++)
+//          Serial.print(rxValue[i]);
+//
+//        Serial.println();
+//        Serial.println("*********");
+//      }
+//    }
+//};
 
 
 void createBLEServer() {
@@ -114,19 +109,19 @@ void createBLEServer() {
 
 	  pTxCharacteristic->addDescriptor(new BLE2902());
 
-	  BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
-												 CHARACTERISTIC_UUID_RX,
-												BLECharacteristic::PROPERTY_WRITE
-											);
-
-	  pRxCharacteristic->setCallbacks(new FLC2BLE_CharCB());
+//	  BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
+//												 CHARACTERISTIC_UUID_RX,
+//												BLECharacteristic::PROPERTY_WRITE
+//											);
+//
+//	  pRxCharacteristic->setCallbacks(new FLC2BLE_CharCB());
 
 	  // Start the service
 	  pService->start();
 
 	  // Start advertising
 	  pServer->getAdvertising()->start();
-	  Serial.println("Waiting a client connection to notify...");
+	  Serial.println("Advertising BLE Service..");
 }
 
 
@@ -150,8 +145,6 @@ void connectToFL() {
 	  SerialBT.setPin("1234");
 	  //SerialBT.setPin("0000");
 	  Serial.println("The device started in master mode, make sure remote BT device is on!");
-
-	  SerialBT.setPin("1234");
 	  bool connected = SerialBT.connect(FLClassicAddress);
 	  if (connected) {
 			cstate = STATE_CONNECTED;
@@ -166,7 +159,6 @@ void connectToFL() {
 	    	cstate = STATE_CONNECTED;
 	    }
 	  }
-
 }
 
 void checkReconn() {
@@ -181,7 +173,6 @@ void checkReconn() {
 	} else {
 		Serial.println("✅");
 	}
-
 }
 
 void setup() {
@@ -195,17 +186,11 @@ void setup() {
 	connectToFL();
 }
 
-
 void loop() {
 	delay(5);
-	static char txValue[128];
-	static uint8_t count=0;
-	count++;
-
 	if (cstate == STATE_CONNECTED) {
 		FLClassicReadFromSerial();
 	}
-
     if (!deviceConnected && deviceConnected_old) {
     	Serial.println("Lost device");
         delay(500); // give the bluetooth stack the chance to get things ready
@@ -216,11 +201,4 @@ void loop() {
 		Serial.println("New device connected");
     	deviceConnected_old = deviceConnected;
     }
-    if (deviceConnected) {
-//    	uint16_t strSize = snprintf(txValue, 127, "Notify number %d at %ul!\n", count, millis());
-//        pTxCharacteristic->setValue((uint8_t*)txValue, strSize);
-//        pTxCharacteristic->notify();
-//		delay(10); // bluetooth stack will go into congestion, if too many packets are sent
-	}
-
 }
