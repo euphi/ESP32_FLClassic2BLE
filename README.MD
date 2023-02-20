@@ -37,11 +37,11 @@ Leider gibt es ein kleines Problem: die ESP32-S3 unterstützen anders als die er
 
 Prio 1:
 
-[ ] Robustheittests
-[ ] Ausprobieren, ob größere MTU möglich (alle Daten eines Strings auf einmal übertragen)
+- [ ] Robustheittests
+- [ ] Ausprobieren, ob größere MTU möglich (alle Daten eines Strings auf einmal übertragen)
 
 Prio 2:
 
-[ ] Parsen eines Teil der Forumslader-Daten, um diese als Standarddienste über Bluetooth LE zu verteilen
-[ ] Veröffentlichen der Daten auf BLE wie von einem Forumslader V6
+- [ ] Parsen eines Teil der Forumslader-Daten, um diese als Standarddienste über Bluetooth LE zu verteilen
+- [ ] Veröffentlichen der Daten auf BLE wie von einem Forumslader V6
 
