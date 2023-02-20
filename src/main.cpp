@@ -51,13 +51,13 @@ void sendStringToBLE(const String bleStr) {  // pass by value
 void FLClassicReadFromSerial() {
 	while (SerialBT.available()) {
 		char read = SerialBT.read();
+		if (read == '\r') continue; // Filter out Carriage Return (use LF \n as line terminator only)
+		bufferSerial += read;
 		if (read == '\n') {
 			Serial.print("Read from FL Classic: ");
 			Serial.println(bufferSerial);
 			sendStringToBLE(bufferSerial);
 			bufferSerial.clear();
-		} else {
-			bufferSerial += read;
 		}
 	}
 }
@@ -140,7 +140,7 @@ void connectToFL() {
   }
 #endif
 
-	  SerialBT.begin("ESP32FL2BLE", true); //Bluetooth device name
+	  SerialBT.begin("UART Service ForumsLader", true); //Bluetooth device name
 	  //SerialBT.enableSSP();
 	  SerialBT.setPin("1234");
 	  //SerialBT.setPin("0000");
