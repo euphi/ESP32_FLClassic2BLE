@@ -36,10 +36,11 @@ void sendStringToBLE(const String bleStr) {  // pass by value
 	uint16_t strStart=0;
     if (deviceConnected) {
     	do {
-            uint16_t strEnd = strStart+20;		// Max default size for string in notification
+            uint16_t mtu = pServer->getPeerMTU(pServer->getConnId()) - 3;
+    		uint16_t strEnd = strStart+mtu;		// Max default size for string in notification
             if (strEnd > bleStr.length()) strEnd = bleStr.length();
     		String subStr = bleStr.substring(strStart,strEnd);
-            strStart+=20;
+            strStart+=mtu;
     		Serial.printf("Send sub-string \"%s\" to BLE by notify\n", subStr.c_str());
         	pTxCharacteristic->setValue((uint8_t*)subStr.c_str(), subStr.length());
             pTxCharacteristic->notify();
@@ -193,7 +194,7 @@ void loop() {
 	}
     if (!deviceConnected && deviceConnected_old) {
     	Serial.println("Lost device");
-        delay(500); // give the bluetooth stack the chance to get things ready
+        delay(250); // give the bluetooth stack the chance to get things ready
         pServer->startAdvertising(); // restart advertising
         Serial.println("start advertising");
         deviceConnected_old = deviceConnected;
