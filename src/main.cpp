@@ -140,6 +140,7 @@ void connectToFL() {
 		cstate = STATE_CONNECTING;
 	    if (!SerialBT.connected(10000)) {
 	      Serial.println("Failed to connect. Retry in 10 seconds");
+	      cstate = STATE_DISCONNECTED;
 	    } else {
 	    	Serial.println("Forumslader Classic connected");
 	    	cstate = STATE_CONNECTED;
@@ -151,11 +152,7 @@ void checkReconn() {
 	Serial.print("ReConnCheck: ");
 	if (cstate == STATE_DISCONNECTED) {
 		Serial.println("❌ Reconnect necessary!");
-	    if (!SerialBT.connected(10000)) {
-	      Serial.println("Failed to connect. Retry in 10 seconds");
-	    } else {
-	    	cstate = STATE_CONNECTED;
-	    }
+		connectToFL();
 	} else {
 		Serial.println("✅");
 	}
