@@ -99,25 +99,10 @@ void createBLEServer() {
 	  pServer = BLEDevice::createServer();
 	  pServer->setCallbacks(new FLC2BLE_SCB());
 
-	  // Create the BLE Service
+	  // Create the BLE Service and characteristic and start it
 	  BLEService *pService = pServer->createService(SERVICE_UUID);
-
-	  // Create a BLE Characteristic
-	  pTxCharacteristic = pService->createCharacteristic(
-											CHARACTERISTIC_UUID_TX,
-											BLECharacteristic::PROPERTY_NOTIFY
-										);
-
+	  pTxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, BLECharacteristic::PROPERTY_NOTIFY);
 	  pTxCharacteristic->addDescriptor(new BLE2902());
-
-//	  BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
-//												 CHARACTERISTIC_UUID_RX,
-//												BLECharacteristic::PROPERTY_WRITE
-//											);
-//
-//	  pRxCharacteristic->setCallbacks(new FLC2BLE_CharCB());
-
-	  // Start the service
 	  pService->start();
 
 	  // Start advertising
@@ -190,10 +175,15 @@ void setup() {
 void loop() {
 	delay(5);
 	if (cstate == STATE_CONNECTED) {
-		FLClassicReadFromSerial();
+		if (SerialBT.isClosed()) {
+			cstate = STATE_DISCONNECTED;
+			Serial.println("Lost connection to FL.");
+		} else {
+			FLClassicReadFromSerial();
+		}
 	}
     if (!deviceConnected && deviceConnected_old) {
-    	Serial.println("Lost device");
+    	Serial.println("Lost BLE device");
         delay(250); // give the bluetooth stack the chance to get things ready
         pServer->startAdvertising(); // restart advertising
         Serial.println("start advertising");
