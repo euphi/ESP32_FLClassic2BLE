@@ -16,18 +16,18 @@ Auf der Suche nach einem besseren Display, idealerweise auch mit Touchbedienung,
 * Batterieanschluss (und damit RTC (Uhr))
 * I2C-Stecker für weitere Sensoren
 
-(Eine erste Software dazu liegt unter https://github.com/euphi/T-RGB-Experiments)
+Der aktuelle Stand meiner Software dazu liegt in https://github.com/euphi/TRGB-BikeComputer
 
 Leider gibt es ein kleines Problem: die ESP32-S3 unterstützen anders als die ersten ESP32 kein Bluetooth Classic mehr, sondern nur noch Bluetooth LE. Damit ist also kein Verbindungsaufbau zu älteren Forumsladern mehr möglich.
 
-*Als Lösung nutze ich zusätzlich einen Standard ESP32, der sich per Bluetooth Classic zum Forumslader V5 verbindet und die empfangenen Daten wieder über Bluetooth LE verteilt.*
+**Als Lösung nutze ich zusätzlich einen Standard ESP32, der sich per Bluetooth Classic zum Forumslader V5 verbindet und die empfangenen Daten wieder über Bluetooth LE verteilt.**
 
 
 ## Was macht das Programm?
 
 * Initialisiert Bluetooth LE und "advertised" den BLE Dienst
 * schaltet Wifi aus, um keinen unnötigen Strom zu verbrauchen
-* Sucht regelmäßig nach dem Forumslader Classic und verbindet sich (neu) _(noch ungetestet)_
+* Sucht regelmäßig nach dem Forumslader Classic und verbindet sich (neu)
 * Schickt empfangene Daten direkt wieder über Bluetooth LE als Notification heraus
 * Wenn kein BLE-Client mehr verbunden ist, wird der Dienst wieder "advertised"
 
@@ -43,16 +43,21 @@ Leider gibt es ein kleines Problem: die ESP32-S3 unterstützen anders als die er
 * `platformio run -t upload`
 * Keine weitere Konfiguration nötig
 
+## Einschränkungen
+
+* Addresse ist hard-codiert und muss im [Code](https://github.com/euphi/ESP32_FLClassic2BLE/blob/397250fd24acecbb80dcbf0044b990a863a41b63/src/main.cpp#L9) geändert werden.
+* der Stromvebrauch ist zu klein, um den USB-Ausgang eines Forumslader einzuschalten. --> Einsatz eines ESP32 mit kleinem Lithium-Akku oder immer parallel größeren Verbraucher anschließen (z. B. den [T-RGB BikeComputer](https://github.com/euphi/TRGB-BikeComputer)
+
 ## TODO - (Unterstützung gesucht!)
 
 Prio 1:
 
 - [ ] Robustheittests
-- [ ] Ausprobieren, ob größere MTU möglich (alle Daten eines Strings auf einmal übertragen)
+- [X] ~~Ausprobieren, ob größere MTU möglich (alle Daten eines Strings auf einmal übertragen)~~ MTU ist jetzt groß genug, um einen String auf einmal zu übertragen. Falls CLient größere MTU ablehnt, funktioniert die framentierung immer noch.
 - [ ] Automatisches Suche nach Forumslader-Adresse
 
 Prio 2:
 
 - [ ] Parsen eines Teil der Forumslader-Daten, um diese als Standarddienste über Bluetooth LE zu verteilen
-- [ ] Veröffentlichen der Daten auf BLE wie von einem Forumslader V6
+- [ ] Veröffentlichen der Daten auf BLE wie von einem Forumslader V5 BLE (oder V6)
 
